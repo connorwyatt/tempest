@@ -20,5 +20,5 @@ fn main() {
         Err(e) => panic!("Could not parse file: {}", e),
     };
 
-    println!("{:?}", data_model);
+    println!("{:#?}", data_model);
 }

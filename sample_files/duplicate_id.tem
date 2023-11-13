@@ -1,0 +1,3 @@
+command(addCustomer): "Add Customer"
+
+aggregate(addCustomer): "Customer"

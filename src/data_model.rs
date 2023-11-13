@@ -1,5 +1,3 @@
-use std::process::exit;
-
 use lazy_regex::regex;
 use strum::EnumString;
 
@@ -11,8 +9,8 @@ pub(crate) struct DataModel {
 
 impl DataModel {
     pub(crate) fn from(input: String) -> Self {
-        let mut nodes = Vec::new();
-        let mut links = Vec::new();
+        let mut nodes: Vec<Node> = Vec::new();
+        let mut links: Vec<Link> = Vec::new();
 
         for (index, line) in input.lines().map(|x| x.trim()).enumerate() {
             let line_number = index + 1;
@@ -22,13 +20,21 @@ impl DataModel {
             }
 
             if let Some(node) = Self::parse_node(line, line_number) {
+                if nodes.iter().any(|x| x.id == node.id) {
+                    panic!(
+                        r#"ID ({}) already exists (line {}):\n    {}"#,
+                        node.id, line_number, line
+                    );
+                }
+
                 nodes.push(node);
             } else if let Some(link) = Self::parse_link(line, line_number) {
                 links.push(link);
             } else {
-                eprintln!("Could not parse (line {}):", line_number);
-                eprintln!("    \"{}\"", line);
-                exit(1);
+                panic!(
+                    r#"Could not parse line (line {}):\n    {}"#,
+                    line_number, input
+                );
             }
         }
 
@@ -54,13 +60,12 @@ impl DataModel {
         let node_type = node_type_string.parse().unwrap();
 
         let Some(captures) = regex.captures(input) else {
-            eprintln!(
-                "Could not parse {} (line {}):",
+            panic!(
+                r#"Could not parse {} (line {}):\n    {}"#,
                 node_type_string.to_lowercase(),
-                line_number
+                line_number,
+                input
             );
-            eprintln!("    \"{}\"", input);
-            exit(1);
         };
 
         Some(Node {
@@ -79,9 +84,10 @@ impl DataModel {
         }
 
         let Some(captures) = regex.captures(input) else {
-            eprintln!("Could not parse link (line {}):", line_number);
-            eprintln!("    \"{}\"", input);
-            exit(1);
+            panic!(
+                r#"Could not parse link (line {}):\n    {}"#,
+                line_number, input
+            );
         };
 
         Some(Link {
@@ -121,7 +127,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parsing_a_string_works() {
+    fn parsing_a_valid_string_works() {
         let string = include_str!("../sample_files/sample.tem");
 
         let data_model = DataModel::from(string.to_string());
@@ -190,5 +196,15 @@ mod tests {
                 ]
             }
         );
+    }
+
+    #[test]
+    #[should_panic(
+        expected = r#"ID (addCustomer) already exists (line 3):\n    aggregate(addCustomer): "Customer""#
+    )]
+    fn parsing_a_string_with_a_duplicate_id_fails() {
+        let string = include_str!("../sample_files/duplicate_id.tem");
+
+        DataModel::from(string.to_string());
     }
 }
