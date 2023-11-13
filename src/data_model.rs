@@ -3,7 +3,7 @@ use std::process::exit;
 use lazy_regex::regex;
 use strum::EnumString;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub(crate) struct DataModel {
     nodes: Vec<Node>,
     links: Vec<Link>,
@@ -78,7 +78,7 @@ impl DataModel {
     }
 }
 
-#[derive(Debug, EnumString)]
+#[derive(Debug, EnumString, PartialEq)]
 pub(crate) enum NodeType {
     #[strum(serialize = "command")]
     Command,
@@ -90,15 +90,92 @@ pub(crate) enum NodeType {
     Policy,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub(crate) struct Node {
     id: String,
     node_type: NodeType,
     text: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub(crate) struct Link {
     start_id: String,
     end_id: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parsing_a_string_works() {
+        let string = include_str!("../sample_files/sample.tem");
+
+        let data_model = DataModel::from(string.to_string());
+
+        assert_eq!(
+            data_model,
+            DataModel {
+                nodes: vec![
+                    Node {
+                        id: String::from("addCustomerCommand"),
+                        node_type: NodeType::Command,
+                        text: String::from("Add Customer"),
+                    },
+                    Node {
+                        id: String::from("addCustomerAggregate"),
+                        node_type: NodeType::Aggregate,
+                        text: String::from("Customer"),
+                    },
+                    Node {
+                        id: String::from("addCustomerEvent"),
+                        node_type: NodeType::Event,
+                        text: String::from("Customer Added"),
+                    },
+                    Node {
+                        id: String::from("verifyCustomerPolicy"),
+                        node_type: NodeType::Policy,
+                        text: String::from("Verify Customer Policy"),
+                    },
+                    Node {
+                        id: String::from("deleteCustomerCommand"),
+                        node_type: NodeType::Command,
+                        text: String::from("Delete Customer"),
+                    },
+                    Node {
+                        id: String::from("deleteCustomerAggregate"),
+                        node_type: NodeType::Aggregate,
+                        text: String::from("Customer"),
+                    },
+                    Node {
+                        id: String::from("deleteCustomerEvent"),
+                        node_type: NodeType::Event,
+                        text: String::from("Customer Deleted"),
+                    },
+                ],
+                links: vec![
+                    Link {
+                        start_id: String::from("addCustomerCommand"),
+                        end_id: String::from("addCustomerAggregate"),
+                    },
+                    Link {
+                        start_id: String::from("addCustomerAggregate"),
+                        end_id: String::from("addCustomerEvent"),
+                    },
+                    Link {
+                        start_id: String::from("addCustomerEvent"),
+                        end_id: String::from("checkCustomerPolicy"),
+                    },
+                    Link {
+                        start_id: String::from("deleteCustomerCommand"),
+                        end_id: String::from("deleteCustomerAggregate"),
+                    },
+                    Link {
+                        start_id: String::from("deleteCustomerAggregate"),
+                        end_id: String::from("deleteCustomerEvent"),
+                    },
+                ]
+            }
+        );
+    }
 }
