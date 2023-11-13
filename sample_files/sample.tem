@@ -1,0 +1,25 @@
+command(addCustomerCommand): "Add Customer"
+
+aggregate(addCustomerAggregate): "Customer"
+
+link: addCustomerCommand -> addCustomerAggregate
+
+event(addCustomerEvent): "Customer Added"
+
+link: addCustomerAggregate -> addCustomerEvent
+
+policy(verifyCustomerPolicy): "Verify Customer Policy"
+
+link: addCustomerEvent -> checkCustomerPolicy
+
+
+
+command(deleteCustomerCommand): "Delete Customer"
+
+aggregate(deleteCustomerAggregate): "Customer"
+
+link: deleteCustomerCommand -> deleteCustomerAggregate
+
+event(deleteCustomerEvent): "Customer Deleted"
+
+link: deleteCustomerAggregate -> deleteCustomerEvent
