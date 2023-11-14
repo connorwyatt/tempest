@@ -22,7 +22,7 @@ impl DataModel {
             if let Some(node) = Self::parse_node(line, line_number) {
                 if nodes.iter().any(|x| x.id == node.id) {
                     panic!(
-                        r#"ID ({}) already exists (line {}):\n    {}"#,
+                        r#"Node with ID ({}) has already been defined (line {}):\n    {}"#,
                         node.id, line_number, line
                     );
                 }
@@ -31,14 +31,14 @@ impl DataModel {
             } else if let Some(link) = Self::parse_link(line, line_number) {
                 if !nodes.iter().any(|x| x.id == link.start_id) {
                     panic!(
-                        r#"ID ({}) does not exist (line {}):\n    {}"#,
+                        r#"Node with ID ({}) has not been defined yet (line {}):\n    {}"#,
                         link.start_id, line_number, line
                     );
                 }
 
                 if !nodes.iter().any(|x| x.id == link.end_id) {
                     panic!(
-                        r#"ID ({}) does not exist (line {}):\n    {}"#,
+                        r#"Node with ID ({}) has not been defined yet (line {}):\n    {}"#,
                         link.end_id, line_number, line
                     );
                 }
@@ -214,7 +214,7 @@ mod tests {
 
     #[test]
     #[should_panic(
-        expected = r#"ID (addCustomer) already exists (line 3):\n    aggregate(addCustomer): "Customer""#
+        expected = r#"Node with ID (addCustomer) has already been defined (line 3):\n    aggregate(addCustomer): "Customer""#
     )]
     fn parsing_a_string_with_a_duplicate_id_fails() {
         let string = include_str!("../sample_files/duplicate_id.tem");
@@ -223,7 +223,9 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = r#"ID (a) does not exist (line 1):\n    link: a -> b"#)]
+    #[should_panic(
+        expected = r#"Node with ID (a) has not been defined yet (line 1):\n    link: a -> b"#
+    )]
     fn parsing_a_string_with_a_link_to_a_missing_id_fails() {
         let string = include_str!("../sample_files/link_to_nonexistent_id.tem");
 
