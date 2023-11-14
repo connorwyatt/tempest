@@ -1,15 +1,20 @@
 use std::fs::read_to_string;
 
 use clap::Parser;
-use data_model::DataModel;
+
+use crate::data_model::DataModel;
 
 mod data_model;
+mod renderer;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
     #[arg()]
     input_file_path: String,
+
+    #[arg()]
+    output_file_path: String,
 }
 
 fn main() {
@@ -20,5 +25,5 @@ fn main() {
         Err(e) => panic!("Could not parse file: {}", e),
     };
 
-    println!("{:#?}", data_model);
+    renderer::render(&data_model, args.output_file_path).expect("should be able to render file");
 }

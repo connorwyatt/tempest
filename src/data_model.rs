@@ -3,8 +3,8 @@ use strum::EnumString;
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct DataModel {
-    nodes: Vec<Node>,
-    links: Vec<Link>,
+    pub(crate) nodes: Vec<Node>,
+    pub(crate) links: Vec<Link>,
 }
 
 impl DataModel {
@@ -125,15 +125,15 @@ pub(crate) enum NodeType {
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct Node {
-    id: String,
-    node_type: NodeType,
-    text: String,
+    pub(crate) id: String,
+    pub(crate) node_type: NodeType,
+    pub(crate) text: String,
 }
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct Link {
-    start_id: String,
-    end_id: String,
+    pub(crate) start_id: String,
+    pub(crate) end_id: String,
 }
 
 #[cfg(test)]

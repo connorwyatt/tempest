@@ -7,3 +7,4 @@ edition = "2021"
 clap = { version = "4.4.8", features = ["derive"] }
 lazy-regex = "3.1.0"
 strum = { version = "0.25", features = ["derive"] }
+svg = "0.14.0"
