@@ -29,6 +29,20 @@ impl DataModel {
 
                 nodes.push(node);
             } else if let Some(link) = Self::parse_link(line, line_number) {
+                if !nodes.iter().any(|x| x.id == link.start_id) {
+                    panic!(
+                        r#"ID ({}) does not exist (line {}):\n    {}"#,
+                        link.start_id, line_number, line
+                    );
+                }
+
+                if !nodes.iter().any(|x| x.id == link.end_id) {
+                    panic!(
+                        r#"ID ({}) does not exist (line {}):\n    {}"#,
+                        link.end_id, line_number, line
+                    );
+                }
+
                 links.push(link);
             } else {
                 panic!(
@@ -183,7 +197,7 @@ mod tests {
                     },
                     Link {
                         start_id: String::from("addCustomerEvent"),
-                        end_id: String::from("checkCustomerPolicy"),
+                        end_id: String::from("verifyCustomerPolicy"),
                     },
                     Link {
                         start_id: String::from("deleteCustomerCommand"),
@@ -204,6 +218,14 @@ mod tests {
     )]
     fn parsing_a_string_with_a_duplicate_id_fails() {
         let string = include_str!("../sample_files/duplicate_id.tem");
+
+        DataModel::from(string.to_string());
+    }
+
+    #[test]
+    #[should_panic(expected = r#"ID (a) does not exist (line 1):\n    link: a -> b"#)]
+    fn parsing_a_string_with_a_link_to_a_missing_id_fails() {
+        let string = include_str!("../sample_files/link_to_nonexistent_id.tem");
 
         DataModel::from(string.to_string());
     }

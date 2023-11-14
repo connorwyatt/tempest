@@ -10,7 +10,7 @@ link: addCustomerAggregate -> addCustomerEvent
 
 policy(verifyCustomerPolicy): "Verify Customer Policy"
 
-link: addCustomerEvent -> checkCustomerPolicy
+link: addCustomerEvent -> verifyCustomerPolicy
 
 
 
