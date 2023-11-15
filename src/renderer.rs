@@ -4,38 +4,44 @@ use std::{
 };
 
 use svg::{
-    node::element::Rectangle,
+    node::{
+        element::Rectangle,
+        Text,
+    },
     Document,
 };
 
-use crate::data_model::{
-    DataModel,
-    NodeType,
+use crate::{
+    data_model::NodeType,
+    layout::Layout,
 };
 
-const STICKY_NOTE_WIDTH: usize = 200;
-
-pub(crate) fn render(data_model: &DataModel, output_file_path: String) -> Result<(), ()> {
+pub(crate) fn render(layout: &Layout, output_file_path: String) -> Result<(), ()> {
     let mut document = Document::new().set("viewBox", (0, 0, 2560, 1440));
 
     let background_rect = Rectangle::new()
         .set("x", 0)
         .set("y", 0)
-        .set("width", 2560)
-        .set("height", 1440)
+        .set("width", layout.size.width)
+        .set("height", layout.size.height)
         .set("fill", THEME.background_color.to_rgb_string());
 
     document = document.add(background_rect);
 
-    for (i, node) in data_model.nodes.iter().enumerate() {
+    for node_layout in &layout.node_layouts {
         let rect = Rectangle::new()
-            .set("x", 50 + i * (STICKY_NOTE_WIDTH + 50))
-            .set("y", 50)
-            .set("width", STICKY_NOTE_WIDTH)
-            .set("height", STICKY_NOTE_WIDTH)
-            .set("fill", get_node_fill(&node.node_type).to_rgb_string());
+            .set("x", node_layout.position.x)
+            .set("y", node_layout.position.y)
+            .set("width", node_layout.size.width)
+            .set("height", node_layout.size.height)
+            .set(
+                "fill",
+                get_node_fill(&node_layout.node.node_type).to_rgb_string(),
+            );
 
-        document = document.add(rect);
+        let text = Text::new(&node_layout.node.text);
+
+        document = document.add(rect).add(text);
     }
 
     let output_directory = path::Path::new(&output_file_path)

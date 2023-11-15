@@ -5,6 +5,7 @@ use clap::Parser;
 use crate::data_model::DataModel;
 
 mod data_model;
+mod layout;
 mod renderer;
 
 #[derive(Parser, Debug)]
@@ -25,5 +26,7 @@ fn main() {
         Err(e) => panic!("Could not parse file: {}", e),
     };
 
-    renderer::render(&data_model, args.output_file_path).expect("should be able to render file");
+    let layout = layout::create_layout(data_model);
+
+    renderer::render(&layout, args.output_file_path).expect("should be able to render file");
 }

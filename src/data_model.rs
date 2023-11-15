@@ -111,7 +111,7 @@ impl DataModel {
     }
 }
 
-#[derive(Debug, EnumString, PartialEq)]
+#[derive(Clone, Debug, EnumString, PartialEq)]
 pub(crate) enum NodeType {
     #[strum(serialize = "command")]
     Command,
@@ -123,14 +123,14 @@ pub(crate) enum NodeType {
     Policy,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) struct Node {
     pub(crate) id: String,
     pub(crate) node_type: NodeType,
     pub(crate) text: String,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) struct Link {
     pub(crate) start_id: String,
     pub(crate) end_id: String,
